@@ -62,6 +62,9 @@ afterEvaluate {
         tasks.named('artifactoryPublish').configure {
             skip = project.hasProperty('artifactory.dryRun')
             
+            // Ensure all build tasks complete before publishing
+            dependsOn tasks.matching { it.name == 'build' || it.name == 'assemble' }
+            
             // Always re-run this task, don't use up-to-date checks
             outputs.upToDateWhen { false }
 

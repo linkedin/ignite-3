@@ -42,6 +42,20 @@ subprojects {
   }
 }
 
+// Configure the root artifactoryDeploy task to depend on all subproject builds
+afterEvaluate {
+  if (tasks.findByName('artifactoryDeploy')) {
+    tasks.named('artifactoryDeploy').configure {
+      // Ensure all subproject builds complete before deploying
+      subprojects.each { subproject ->
+        if (subproject.tasks.findByName('build')) {
+          dependsOn subproject.tasks.build
+        }
+      }
+    }
+  }
+}
+
 task ciPerformRelease {
   description = "Performs the release, intended to be ran on CI"
   dependsOn "githubRelease", "artifactoryPublishAll"
